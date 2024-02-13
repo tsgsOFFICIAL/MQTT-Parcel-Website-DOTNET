@@ -5,28 +5,54 @@
 
 <article class="tracking container flex-row">
     <section class="flex-col">
-        <small>Parcel is at sorting facility</small>
+        <small id="payload-info"></small>
         <img class="invert small-icon" src="./img/postman_icon.svg" alt="postman icon">
     </section>
 </article>
 
-<div id="payload-container">
-    @ViewBag.Payload
-</div>
-
 @section Scripts {
     <script>
+        let payloadInterval;
+
+        async function updateSubscribtion(topic) {
+            const response = await fetch(`/Home/UpdateSubscribtion?topic=${topic}`);
+            clearInterval(payloadInterval); // Clear the interval timer
+            payloadInterval = setInterval(updatePayload, 500); // Set a new interval timer
+            updatePayload(); // Update payload immediately after subscription update
+        }
+
         function updatePayload() {
             fetch('/Home/GetPayload')
                 .then(response => response.text())
                 .then(payload => {
-                    document.getElementById("payload-container").innerText = payload;
+                    const root = document.documentElement;
+                    const searchBarValue = document.getElementById("parcel-search-bar").value;
+
+                    if (payload == "0") {
+                        document.getElementById("payload-info").innerText = "Parcel is at distribution center";
+                        document.getElementById("payload-info").className = "";
+                        root.style.setProperty('--parcel-length-percentage', `0%`);
+                    } else if (payload == "1") {
+                        document.getElementById("payload-info").innerText = "Parcel is out for delivery";
+                        document.getElementById("payload-info").className = "";
+                        root.style.setProperty('--parcel-length-percentage', `50%`);
+                    } else if (payload == "2") {
+                        document.getElementById("payload-info").innerText = "Parcel is delivered";
+                        document.getElementById("payload-info").className = "";
+                        root.style.setProperty('--parcel-length-percentage', `100%`);
+                    } else {
+                        document.getElementById("payload-info").innerText = "Parcel not found!";
+                        document.getElementById("payload-info").className = "invalid";
+                        root.style.setProperty('--parcel-length-percentage', `50%`);
+                    }
                 });
         }
 
-        // Update payload every 5 seconds
-        setInterval(updatePayload, 5000);
-        // Initial update
-        updatePayload();
+        function searchIconPressed() {
+            const searchBarValue = document.getElementById("parcel-search-bar").value;
+
+            // Call updateSubscribtion with the topic
+            updateSubscribtion(searchBarValue);
+        }
     </script>
 }

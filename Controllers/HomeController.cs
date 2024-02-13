@@ -10,11 +10,16 @@ namespace MQTT_Parcel_Website.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MqttService _mqttService;
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            await _mqttService.ConnectClient();
-            ViewBag.Payload = _mqttService.GetPayload();
             return View();
+        }
+
+        [HttpGet("/Home/UpdateSubscribtion")]
+        public async Task<IActionResult> UpdateSubscribtion(string topic)
+        {
+            await _mqttService.UpdateSubscribtion(topic);
+            return View("Index");
         }
 
         public IActionResult GetPayload()

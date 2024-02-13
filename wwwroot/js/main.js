@@ -40,22 +40,6 @@ function showNotification(notifyTitle, notifyBody) {
     }
 }
 
-function searchIconPressed() {
-    // Select the :root pseudo-element
-    const root = document.documentElement;
-    const serachBarValue = document.getElementById("parcel-search-bar").value;
-
-    // Change the value of the CSS variable
-    root.style.setProperty('--parcel-length-percentage', `${serachBarValue}%`);
-
-    showNotification("Search icon pressed 1", `You have just searched: ${serachBarValue}`);
-
-    setTimeout(() => {
-        showNotification("Search icon pressed 2", `You have just searched: ${serachBarValue}`);
-    }, 15 * 1000);
-
-}
-
 // document.addEventListener("DOMContentLoaded", () => {
 //     fetchData();
 

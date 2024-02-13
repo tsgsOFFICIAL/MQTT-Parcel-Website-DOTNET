@@ -1,5 +1,5 @@
 :root {
-    --parcel-length-percentage: 0%;
+    --parcel-length-percentage: -50%;
 }
 
 body>header {
@@ -70,15 +70,21 @@ main {
 }
 
 .container.tracking>section {
+    display: flex;
+    align-items: center;
     position: absolute;
     left: var(--parcel-length-percentage);
     transform: translateX(calc(var(--parcel-length-percentage) * -1));
-    transition: all .3s ease;
+    transition: all .3s ease-out;
+}
+
+#payload-info {
+    font-size: 1.69rem;
 }
 
 .small-icon {
     aspect-ratio: 1;
-    width: 10rem;
+    width: 15rem;
 }
 
 /* Media Queries */

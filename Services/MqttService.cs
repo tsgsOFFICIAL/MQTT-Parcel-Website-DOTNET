@@ -8,15 +8,15 @@ namespace MQTT_Parcel_Website.Services
 {
     public class MqttService
     {
-        private string _payload;
-        private IMqttClient _mqttClient;
+        private static string? _payload;
+        private static IMqttClient? _mqttClient;
+        private static string? _lastSubscribedTopic;
 
         public async Task ConnectClient()
         {
-            string broker = "192.168.1.45";
+            string broker = "192.168.50.24";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
-            string topic = "demo";
 
             MqttFactory mqttFactory = new MqttFactory();
             _mqttClient = mqttFactory.CreateMqttClient();
@@ -25,20 +25,11 @@ namespace MQTT_Parcel_Website.Services
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
                 .WithCleanSession()
-                .WithKeepAlivePeriod(TimeSpan.FromSeconds(10))
+                .WithKeepAlivePeriod(TimeSpan.FromMinutes(15))
                 .WithProtocolVersion(MqttProtocolVersion.V311)
                 .Build();
 
             await _mqttClient.ConnectAsync(options);
-
-            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce).Build());
-
-            _mqttClient.ApplicationMessageReceivedAsync += (e) => {
-                e.AutoAcknowledge = true;
-                string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-                OnMessageReceived(payload);
-                return Task.CompletedTask;
-            };
         }
 
         private void OnMessageReceived(string payload)
@@ -48,7 +39,46 @@ namespace MQTT_Parcel_Website.Services
 
         public string GetPayload()
         {
-            return _payload;
+            return _payload ?? "";
+        }
+
+        public async Task UpdateSubscribtion(string topic)
+        {
+            if (_mqttClient != null && _mqttClient.IsConnected)
+            {
+
+                // Remove existing event handler if it exists
+                _mqttClient.ApplicationMessageReceivedAsync -= HandleApplicationMessageReceived;
+
+                // Unsubscribe from the last subscribed topic if it exists
+                if (!string.IsNullOrEmpty(_lastSubscribedTopic))
+                {
+                    _payload = "";
+                    await _mqttClient.UnsubscribeAsync(_lastSubscribedTopic);
+                    _lastSubscribedTopic = string.Empty;
+                }
+            }
+            else
+            {
+                await ConnectClient();
+            }
+
+            _lastSubscribedTopic = topic;
+            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce).Build());
+
+            // Add the new event handler for the current subscription
+            _mqttClient!.ApplicationMessageReceivedAsync += HandleApplicationMessageReceived;
+        }
+
+
+
+        // Define the event handler for the ApplicationMessageReceived event
+        private async Task HandleApplicationMessageReceived(MqttApplicationMessageReceivedEventArgs e)
+        {
+             e.AutoAcknowledge = true;
+            string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+            OnMessageReceived(payload);
+            await Task.CompletedTask;
         }
     }
 }
