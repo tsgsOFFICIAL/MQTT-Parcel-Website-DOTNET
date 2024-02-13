@@ -52,7 +52,11 @@
             const searchBarValue = document.getElementById("parcel-search-bar").value;
 
             // Call updateSubscribtion with the topic
-            updateSubscribtion(searchBarValue);
+            if (searchBarValue) {
+                updateSubscribtion(searchBarValue);
+            } else {
+                showNotification("Error", "Cannot search for '', please specify a package id");
+            }
         }
     </script>
 }
