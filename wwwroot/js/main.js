@@ -1,22 +1,23 @@
-let registration;
+const registration = await navigator.serviceWorker.getRegistration();
 
-topLevelFunction();
 requestPermission();
 
-async function topLevelFunction() {
-    registration = await navigator.serviceWorker.getRegistration();
-}
 
-function requestPermission() {
-    if (!('Notification' in window)) {
-        alert('Notification API not supported!');
-        return;
+const sendNotification = async (notifyTitle, notifyBody) => {
+    if (Notification.permission === 'granted') {
+        showNotification(notifyTitle, notifyBody);
+    } else {
+        if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission();
+
+            if (permission === 'granted') {
+                showNotification(notifyTitle, notifyBody);
+            }
+        }
     }
+};
 
-    Notification.requestPermission(() => { });
-}
-
-function showNotification(notifyTitle, notifyBody) {
+const showNotification = (notifyTitle, notifyBody) => {
     const notifyImg = `./assets/icons/icon-128x128.png`;
 
     const payload = {
@@ -24,17 +25,20 @@ function showNotification(notifyTitle, notifyBody) {
         icon: notifyImg,
     };
 
-    if (!('Notification' in window)) {
-        alert('Notification API not supported!');
-        return;
-    }
-
-    if (Notification.permission === 'granted') {
+    if ('showNotification' in registration) {
+        registration.showNotification(notifyTitle, payload);
+    } else {
         let notification = new Notification(notifyTitle, payload);
 
         // Eventlistener to react, when a user clicks on a notification
         notification.onclick = () => {
             console.log('The notification was clicked');
         };
+    }
+};
+
+function requestPermission() {
+    if (Notification.permission !== 'denied') {
+        await Notification.requestPermission();
     }
 }
