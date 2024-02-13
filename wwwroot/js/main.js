@@ -1,7 +1,6 @@
-const registration = await navigator.serviceWorker.getRegistration();
+let registration;
 
-requestPermission();
-
+topLevelFunction();
 
 const sendNotification = async (notifyTitle, notifyBody) => {
     if (Notification.permission === 'granted') {
@@ -37,8 +36,13 @@ const showNotification = (notifyTitle, notifyBody) => {
     }
 };
 
-function requestPermission() {
+async function requestPermission() {
     if (Notification.permission !== 'denied') {
         await Notification.requestPermission();
     }
+}
+
+async function topLevelFunction() {
+    registration = await navigator.serviceWorker.getRegistration();
+    requestPermission();
 }
