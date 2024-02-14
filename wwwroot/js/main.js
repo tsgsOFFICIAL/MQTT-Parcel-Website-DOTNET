@@ -50,7 +50,7 @@ function showPersistentNotification(notifyTitle, notifyBody) {
 
     try {
         navigator.serviceWorker.getRegistration()
-            .then((reg) => reg.showNotification(notifyTitle))//, payload))
+            .then((reg) => reg.showNotification(notifyTitle, payload))
             .catch((err) => alert('Service Worker registration error: ' + err));
     } catch (err) {
         alert('Notification API error: ' + err);

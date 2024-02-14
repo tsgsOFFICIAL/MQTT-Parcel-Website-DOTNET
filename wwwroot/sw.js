@@ -20,10 +20,30 @@ const assets = [
 self.addEventListener('install', installEvent => {
     installEvent.waitUntil(
         caches.open(cacheName).then(cache => {
-            return cache.addAll(assets);
-        })
+            return Promise.all(
+                assets.map(url => {
+                    return fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Failed to fetch "${url}", status: ${response.status}`);
+                            }
+
+                            return cache.put(url, response);
+                        })
+                        .catch(error => console.error(`Failed to cache "${url}": ${error.message}`));
+                })
+            );
+        }).catch(error => console.error('Cache open failed:', error))
     );
 });
+
+//self.addEventListener('install', installEvent => {
+//    installEvent.waitUntil(
+//        caches.open(cacheName).then(cache => {
+//            return cache.addAll(assets);
+//        })
+//    );
+//});
 
 // Our service worker will intercept all fetch requests
 // and check if we have cached the file
