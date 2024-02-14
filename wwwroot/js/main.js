@@ -30,7 +30,8 @@ function showNonPersistentNotification(notifyTitle, notifyBody) {
             console.log('The notification was clicked');
         };
     } catch (err) {
-        alert('Notification API error: ' + err);
+        showPersistentNotification(notifyTitle, notifyBody);
+        //alert('Notification API error: ' + err);
     }
 }
 
