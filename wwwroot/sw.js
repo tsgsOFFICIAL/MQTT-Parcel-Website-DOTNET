@@ -1,9 +1,8 @@
 const cacheName = 'mqtt_parcel_cache';
 const assets = [
     './',
-    './index.html',
     './manifest.json',
-    './logo.svg',
+    './logo.png',
     './js/cookie.js',
     './js/main.js',
     './img/cookie.svg',
