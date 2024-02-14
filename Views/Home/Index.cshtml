@@ -29,17 +29,17 @@
                     const searchBarValue = document.getElementById("parcel-search-bar").value;
 
                     if (payload == "0") {
-                        sendNotification("Parcel Update", "Parcel is at distribution center");
+                        showNonPersistentNotification("Parcel Update", "Parcel is at distribution center");
                         document.getElementById("payload-info").innerText = "Parcel is at distribution center";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `0%`);
                     } else if (payload == "1") {
-                        sendNotification("Parcel Update", "Parcel is out for delivery");
+                        showNonPersistentNotification("Parcel Update", "Parcel is out for delivery");
                         document.getElementById("payload-info").innerText = "Parcel is out for delivery";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `50%`);
                     } else if (payload == "2") {
-                        sendNotification("Parcel Update", "Parcel is delivered");
+                        showNonPersistentNotification("Parcel Update", "Parcel is delivered");
                         document.getElementById("payload-info").innerText = "Parcel is delivered";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `100%`);
@@ -58,7 +58,7 @@
             if (searchBarValue) {
                 updateSubscribtion(searchBarValue);
             } else {
-                sendNotification("Error", "Cannot search for '', please specify a package id");
+                showNonPersistentNotification("Error", "Cannot search for '', please specify a package id");
             }
         }
     </script>
