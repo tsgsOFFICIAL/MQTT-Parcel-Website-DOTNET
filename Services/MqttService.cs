@@ -14,7 +14,7 @@ namespace MQTT_Parcel_Website.Services
 
         public async Task ConnectClient()
         {
-            string broker = "192.168.50.24";
+            string broker = "85.83.170.136";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
 
