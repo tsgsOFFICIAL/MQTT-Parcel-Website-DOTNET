@@ -55,3 +55,5 @@ function showPersistentNotification(notifyTitle, notifyBody) {
         alert('Notification API error: ' + err);
     }
 }
+
+requestPermission();
