@@ -36,14 +36,6 @@ self.addEventListener('install', installEvent => {
     );
 });
 
-//self.addEventListener('install', installEvent => {
-//    installEvent.waitUntil(
-//        caches.open(cacheName).then(cache => {
-//            return cache.addAll(assets);
-//        })
-//    );
-//});
-
 // Our service worker will intercept all fetch requests
 // and check if we have cached the file
 // if so it will serve the cached file
