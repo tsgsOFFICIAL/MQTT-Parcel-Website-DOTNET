@@ -15,7 +15,7 @@ namespace MQTT_Parcel_Website.Controllers
             return View();
         }
 
-        [Route("[controller]/Parcel/{trackingUri}")]
+        [Route("/Parcel/{trackingUri}")]
         public IActionResult TrackParcel(string trackingUri)
         {
             if (!string.IsNullOrEmpty(trackingUri))

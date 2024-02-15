@@ -45,7 +45,7 @@
                         document.getElementById("payload-info").innerText = "Parcel is out for delivery";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `50%`);
-                    } else if (payload == "2" && lastReceivedPayload != "2") {
+                    } else if (payload == "2") {
                         if (lastReceivedPayload != "2") {
                             showNonPersistentNotification("Parcel Update", "Parcel is delivered");
                         }
@@ -63,15 +63,40 @@
                 });
         }
 
-        function searchIconPressed() {
-            const searchBarValue = document.getElementById("parcel-search-bar").value;
+        function searchIconPressed(forcedValue) {
+            let value;
+            if (forcedValue) {
+                value = forcedValue;
+                document.getElementById("parcel-search-bar").value = forcedValue;
+            } else {
+                value = document.getElementById("parcel-search-bar").value;
+
+            }
 
             // Call updateSubscribtion with the topic
-            if (searchBarValue) {
-                updateSubscribtion(searchBarValue);
+            if (value) {
+                updateSubscribtion(value);
             } else {
                 showNonPersistentNotification("Error", "Cannot search for '', please specify a package id");
             }
         }
+
+        window.addEventListener("load", () => {
+            // Get the URL of the current page
+            const url = new URL(window.location.href);
+
+            // Get the value of the trackingUri query parameter
+            const trackingUri = url.searchParams.get('trackingUri');
+
+            if (trackingUri) {
+                // Clear the trackingUri parameter from the URL
+                url.searchParams.delete('trackingUri');
+
+                // Replace the current URL with the updated URL (without trackingUri)
+                history.replaceState({}, '', url.href);
+
+                searchIconPressed(trackingUri);
+            }
+        });
     </script>
 }
