@@ -74,6 +74,9 @@ a:hover {
     color: var(--secondary-color);
 }
 
+.underline > a:hover {
+    color: inherit;
+}
 a.button,
 button {
     background-color: var(--secondary-color);
@@ -219,8 +222,4 @@ ol {
 
 .flex-col.nowrap {
     flex-wrap: nowrap;
-}
-
-.invert {
-    filter: invert(100%);
 }
