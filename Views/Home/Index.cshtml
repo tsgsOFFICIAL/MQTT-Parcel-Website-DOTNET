@@ -29,18 +29,27 @@
                     const root = document.documentElement;
                     const searchBarValue = document.getElementById("parcel-search-bar").value;
 
-                    if (payload == "0" && lastReceivedPayload != "0") {
-                        showNonPersistentNotification("Parcel Update", "Parcel is at distribution center");
+                    if (payload == "0") {
+                        if (lastReceivedPayload != "0") {
+                            showNonPersistentNotification("Parcel Update", "Parcel is at distribution center");
+                        }
+
                         document.getElementById("payload-info").innerText = "Parcel is at distribution center";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `0%`);
-                    } else if (payload == "1" && lastReceivedPayload != "1") {
-                        showNonPersistentNotification("Parcel Update", "Parcel is out for delivery");
+                    } else if (payload == "1") {
+                        if (lastReceivedPayload != "1") {
+                            showNonPersistentNotification("Parcel Update", "Parcel is out for delivery");
+                        }
+
                         document.getElementById("payload-info").innerText = "Parcel is out for delivery";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `50%`);
                     } else if (payload == "2" && lastReceivedPayload != "2") {
-                        showNonPersistentNotification("Parcel Update", "Parcel is delivered");
+                        if (lastReceivedPayload != "2") {
+                            showNonPersistentNotification("Parcel Update", "Parcel is delivered");
+                        }
+
                         document.getElementById("payload-info").innerText = "Parcel is delivered";
                         document.getElementById("payload-info").className = "";
                         root.style.setProperty('--parcel-length-percentage', `100%`);
