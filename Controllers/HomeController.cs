@@ -15,6 +15,17 @@ namespace MQTT_Parcel_Website.Controllers
             return View();
         }
 
+        [Route("[controller]/Parcel/{trackingUri}")]
+        public IActionResult TrackParcel(string trackingUri)
+        {
+            if (!string.IsNullOrEmpty(trackingUri))
+            {
+                return RedirectToAction("Index", "/", new { trackingUri });
+            }
+
+            return View("/Index");
+        }
+
         [HttpGet("/Home/UpdateSubscribtion")]
         public async Task<IActionResult> UpdateSubscribtion(string topic)
         {
