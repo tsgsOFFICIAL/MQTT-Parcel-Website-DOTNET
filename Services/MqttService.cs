@@ -27,6 +27,7 @@ namespace MQTT_Parcel_Website.Services
                 .WithCleanSession()
                 .WithKeepAlivePeriod(TimeSpan.FromMinutes(15))
                 .WithProtocolVersion(MqttProtocolVersion.V311)
+                .WithoutPacketFragmentation()
                 .Build();
 
             await _mqttClient.ConnectAsync(options);
@@ -76,13 +77,10 @@ namespace MQTT_Parcel_Website.Services
                 MqttApplicationMessage mqttMessage = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
                 .WithPayload(state)
-                .WithRetainFlag(true)
-                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
+                .WithRetainFlag()
                 .Build();
 
-                var response = await _mqttClient.PublishAsync(mqttMessage, CancellationToken.None);
-
-                await _mqttClient.DisconnectAsync();
+                var response = await _mqttClient.PublishAsync(mqttMessage);
 
                 return response.ToString() ?? "";
             }
