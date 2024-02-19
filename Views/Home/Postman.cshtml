@@ -66,59 +66,6 @@ writeLog(`Barcode detection error: ${err}`);
 }
 </script> *@
 
-
-    @* <script>
-// Define variables
-let scannerIsRunning = false;
-
-// Initialize barcode scanner
-async function initBarcodeScanner() {
-const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-const videoElement = document.createElement('video');
-videoElement.srcObject = stream;
-document.getElementById('barcodeScanner').appendChild(videoElement);
-
-const barcodeDetector = new BarcodeDetector();
-const statusSelect = document.getElementById('status');
-
-videoElement.onloadedmetadata = () => {
-videoElement.play();
-scannerIsRunning = true;
-scanBarcode(barcodeDetector, statusSelect);
-};
-
-document.getElementById('updateStatusBtn').addEventListener('click', () => {
-if (scannerIsRunning) {
-scannerIsRunning = false;
-stream.getTracks().forEach(track => track.stop());
-videoElement.remove();
-}
-});
-}
-
-// Scan barcode function
-async function scanBarcode(barcodeDetector, statusSelect) {
-while (scannerIsRunning) {
-try {
-const barcodes = await barcodeDetector.detect(document.querySelector('video'));
-if (barcodes.length > 0) {
-const barcodeValue = barcodes[0].rawValue;
-const selectedStatus = statusSelect.value;
-console.log("Barcode Value:", barcodeValue);
-console.log("Selected Status:", selectedStatus);
-// Implement logic to update parcel status
-}
-} catch (error) {
-console.error('Barcode detection failed:', error);
-}
-await new Promise(resolve => setTimeout(resolve, 1000));
-}
-}
-
-// Initialize barcode scanner
-initBarcodeScanner();
-</script> *@
-
     <script>
         // Define variables
         let scannerIsRunning = false;
@@ -138,22 +85,15 @@ initBarcodeScanner();
                     scanBarcode(barcodeDetector, video);
                 };
 
-        @* const barcodes = await barcodeDetector.detect(video);
-
-                if (barcodes.length > 0) {
-                const barcodeDataElement = document.getElementById('barcodeData');
-                barcodeDataElement.textContent = `Detected Barcode: ${barcodes[0].rawValue}`;
-                } *@
-
-                    document.getElementById('stopScannerBtn').addEventListener('click', () => {
-                        if (scannerIsRunning) {
-                            scannerIsRunning = false;
-                            stream.getTracks().forEach(track => track.stop());
-                            video.srcObject = null;
-                        }
-                    });
+                document.getElementById('stopScannerBtn').addEventListener('click', () => {
+                    if (scannerIsRunning) {
+                        scannerIsRunning = false;
+                        stream.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    }
+                });
             } catch (error) {
-                alert('Barcode detection failed:', error);
+                alert('Barcode detection failed: ', error);
             }
         }
 
@@ -172,7 +112,7 @@ initBarcodeScanner();
                         console.log("Barcode Value:", barcodeValue);
                     }
                 } catch (error) {
-                    console.error('Barcode detection failed:', error);
+                    alert('Barcode scan failed: ', error);
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
