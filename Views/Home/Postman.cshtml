@@ -2,51 +2,115 @@
     ViewData["Title"] = "Postman Page";
 }
 
-<p>Upload an image: <input type="file" id="file" accept="image/*"/></p>
+@* <p>Upload an image: <input type="file" id="file" accept="image/*"/></p>
 <div>
-    <button type="button" onclick="detectBarcode()">Detect Barcode</button>
+<button type="button" onclick="detectBarcode()">Detect Barcode</button>
 </div>
-<div id="target"></div>
+<div id="target"></div> *@
 
+<h1>Parcel Tracking</h1>
+<div id="barcodeScanner"></div>
+<div id="parcelStatus">
+    <label for="status">Set Parcel Status:</label>
+    <select id="status">
+        <option value="received">Received</option>
+        <option value="out_for_delivery">Out for Delivery</option>
+        <option value="delivered">Delivered</option>
+    </select>
+    <button id="updateStatusBtn">Update Status</button>
+</div>
 
 @section Scripts {
+    @* <script>
+function writeLog(message) {
+const newState = document.createElement('p');
+newState.innerHTML = message;
+document.getElementById('target').appendChild(newState);
+}
+
+function detectBarcode() {
+if (!('BarcodeDetector' in window)) {
+alert('BarcodeDetector is not available');
+return;
+}
+
+const file = document.getElementById('file').files[0];
+
+if (!file) {
+alert('No image - Upload an image first.');
+return;
+}
+
+document.getElementById('target').innerHTML = '';
+const detector = new BarcodeDetector();
+
+createImageBitmap(file)
+.then((image) => detector.detect(image))
+.then((results) => {
+if (results.length) {
+results.forEach((result) => {
+writeLog(`Detected text: "${result.rawValue}" at (${Math.round(result.boundingBox.x)}, ${Math.round(result.boundingBox.y)})`);
+})
+} else {
+writeLog('No barcodes detected.');
+}
+})
+.catch((err) => {
+writeLog(`Barcode detection error: ${err}`);
+})
+}
+</script> *@
+
+
     <script>
-        function writeLog(message) {
-            const newState = document.createElement('p');
-            newState.innerHTML = message;
-            document.getElementById('target').appendChild(newState);
-        }
+        // Define variables
+        let scannerIsRunning = false;
 
-        function detectBarcode() {
-            if (!('BarcodeDetector' in window)) {
-                alert('BarcodeDetector is not available');
-                return;
-            }
+        // Initialize barcode scanner
+        async function initBarcodeScanner() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            const videoElement = document.createElement('video');
+            videoElement.srcObject = stream;
+            document.getElementById('barcodeScanner').appendChild(videoElement);
 
-            const file = document.getElementById('file').files[0];
+            const barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'code_128'] });
+            const statusSelect = document.getElementById('status');
 
-            if (!file) {
-                alert('No image - Upload an image first.');
-                return;
-            }
+            videoElement.onloadedmetadata = () => {
+                videoElement.play();
+                scannerIsRunning = true;
+                scanBarcode(barcodeDetector, statusSelect);
+            };
 
-            document.getElementById('target').innerHTML = '';
-            const detector = new BarcodeDetector();
-
-            createImageBitmap(file)
-            .then((image) => detector.detect(image))
-            .then((results) => {
-                if (results.length) {
-                    results.forEach((result) => {
-                        writeLog(`Detected text: "${result.rawValue}" at (${Math.round(result.boundingBox.x)}, ${Math.round(result.boundingBox.y)})`);
-                    })
-                } else {
-                    writeLog('No barcodes detected.');
+            document.getElementById('updateStatusBtn').addEventListener('click', () => {
+                if (scannerIsRunning) {
+                    scannerIsRunning = false;
+                    stream.getTracks().forEach(track => track.stop());
+                    videoElement.remove();
                 }
-            })
-            .catch((err) => {
-                writeLog(`Barcode detection error: ${err}`);
-            })
+            });
         }
+
+        // Scan barcode function
+        async function scanBarcode(barcodeDetector, statusSelect) {
+            while (scannerIsRunning) {
+                try {
+                    const barcodes = await barcodeDetector.detect(document.querySelector('video'));
+                    if (barcodes.length > 0) {
+                        const barcodeValue = barcodes[0].rawValue;
+                        const selectedStatus = statusSelect.value;
+                        console.log("Barcode Value:", barcodeValue);
+                        console.log("Selected Status:", selectedStatus);
+                        // Implement logic to update parcel status
+                    }
+                } catch (error) {
+                    console.error('Barcode detection failed:', error);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Initialize barcode scanner
+        initBarcodeScanner();
     </script>
 }
