@@ -77,6 +77,7 @@ namespace MQTT_Parcel_Website.Services
                 .WithTopic(topic)
                 .WithPayload(state)
                 .WithRetainFlag(true)
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
 
                 await _mqttClient.PublishAsync(mqttMessage, CancellationToken.None);
