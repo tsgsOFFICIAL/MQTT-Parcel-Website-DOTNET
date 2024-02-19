@@ -1,12 +1,31 @@
 {
   "name": "MQTT Parcel Tracker",
   "short_name": "MQTT Parcel",
+  "description": "An intuitive and easy to use, parcel tracker for your MQTT Parcels!",
   "theme_color": "#13A4ED",
   "background_color": "#353535",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "https://mqtt-parcel-website.azurewebsites.net/",
+  "start_url": ".",
+  "categories": [
+    "barcode",
+    "scanner",
+    "utilities",
+    "parcel",
+    "tracker",
+    "postal",
+    "universal",
+    "mqtt"
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/parcel-tracking.png",
+      "sizes": "1440x3085",
+      "type": "image/png",
+      "label": "Parcel tracking with ease"
+    }
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-72x72.png",
