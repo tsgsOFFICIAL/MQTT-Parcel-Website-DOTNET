@@ -49,6 +49,7 @@ namespace MQTT_Parcel_Website.Controllers
             return View();
         }
 
+        [Route("/Postman")]
         public IActionResult Postman()
         {
             return View();
