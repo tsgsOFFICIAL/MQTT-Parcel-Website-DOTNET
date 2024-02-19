@@ -49,6 +49,11 @@ namespace MQTT_Parcel_Website.Controllers
             return View();
         }
 
+        public IActionResult Postman()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

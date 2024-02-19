@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Postman Page";
+}
+
+<p>Upload an image: <input type="file" id="file" accept="image/*"/></p>
+<div>
+    <button type="button" onclick="detectBarcode()">Detect Barcode</button>
+</div>
+<div id="target"></div>
+
+
+@section Scripts {
+    <script>
+        function writeLog(message) {
+            const newState = document.createElement('p');
+            newState.innerHTML = message;
+            document.getElementById('target').appendChild(newState);
+        }
+
+        function detectBarcode() {
+            if (!('BarcodeDetector' in window)) {
+                alert('BarcodeDetector is not available');
+                return;
+            }
+
+            const file = document.getElementById('file').files[0];
+
+            if (!file) {
+                alert('No image - Upload an image first.');
+                return;
+            }
+
+            document.getElementById('target').innerHTML = '';
+            const detector = new BarcodeDetector();
+
+            createImageBitmap(file)
+            .then((image) => detector.detect(image))
+            .then((results) => {
+                if (results.length) {
+                    results.forEach((result) => {
+                        writeLog(`Detected text: "${result.rawValue}" at (${Math.round(result.boundingBox.x)}, ${Math.round(result.boundingBox.y)})`);
+                    })
+                } else {
+                    writeLog('No barcodes detected.');
+                }
+            })
+            .catch((err) => {
+                writeLog(`Barcode detection error: ${err}`);
+            })
+        }
+    </script>
+}
