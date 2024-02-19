@@ -69,7 +69,7 @@ namespace MQTT_Parcel_Website.Services
             _mqttClient!.ApplicationMessageReceivedAsync += HandleApplicationMessageReceived;
         }
 
-        public async Task PublishPayload(string topic, string state)
+        public async Task<string> PublishPayload(string topic, string state)
         {
             if (_mqttClient != null && _mqttClient.IsConnected)
             {
@@ -80,14 +80,18 @@ namespace MQTT_Parcel_Website.Services
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
 
-                await _mqttClient.PublishAsync(mqttMessage, CancellationToken.None);
+                var response = await _mqttClient.PublishAsync(mqttMessage, CancellationToken.None);
 
                 await _mqttClient.DisconnectAsync();
+
+                return response.ToString() ?? "";
             }
             else
             {
                 await ConnectClient();
                 _ = PublishPayload(topic, state);
+
+                return "";
             }
         }
 

@@ -105,7 +105,9 @@
             const parcelUri = document.getElementById('parcel-search-bar').value;
 
             if (parcelUri && state) {
-                await fetch(`/Home/PublishPayload?topic=${parcelUri}&state=${state}`);
+                let result = await fetch(`/Home/PublishPayload?topic=${parcelUri}&state=${state}`);
+
+                console.log(result);
             }
         }
     </script>
