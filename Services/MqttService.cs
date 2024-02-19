@@ -46,7 +46,6 @@ namespace MQTT_Parcel_Website.Services
         {
             if (_mqttClient != null && _mqttClient.IsConnected)
             {
-
                 // Remove existing event handler if it exists
                 _mqttClient.ApplicationMessageReceivedAsync -= HandleApplicationMessageReceived;
 
@@ -70,12 +69,31 @@ namespace MQTT_Parcel_Website.Services
             _mqttClient!.ApplicationMessageReceivedAsync += HandleApplicationMessageReceived;
         }
 
+        public async Task PublishPayload(string topic, string state)
+        {
+            if (_mqttClient != null && _mqttClient.IsConnected)
+            {
+                MqttApplicationMessage mqttMessage = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(state)
+                .WithRetainFlag(true)
+                .Build();
 
+                await _mqttClient.PublishAsync(mqttMessage, CancellationToken.None);
+
+                await _mqttClient.DisconnectAsync();
+            }
+            else
+            {
+                await ConnectClient();
+                _ = PublishPayload(topic, state);
+            }
+        }
 
         // Define the event handler for the ApplicationMessageReceived event
         private async Task HandleApplicationMessageReceived(MqttApplicationMessageReceivedEventArgs e)
         {
-             e.AutoAcknowledge = true;
+            e.AutoAcknowledge = true;
             string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
             OnMessageReceived(payload);
             await Task.CompletedTask;

@@ -1,0 +1,20 @@
+#scannerContainer {
+    gap: 2rem;
+}
+
+#parcelStatus {
+    align-items: center;
+    gap: 1rem;
+}
+
+select {
+    background-color: var(--secondary-color);
+    border: none;
+    border-radius: 0.69rem;
+    padding: 0.25rem 1rem;
+}
+
+label {
+    font-size: 1.69rem;
+    text-align: center;
+}

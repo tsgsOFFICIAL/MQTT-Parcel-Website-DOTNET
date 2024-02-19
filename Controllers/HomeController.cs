@@ -33,6 +33,12 @@ namespace MQTT_Parcel_Website.Controllers
             return View("Index");
         }
 
+        [HttpGet("/Home/PublishPayload")]
+        public async Task PublishPayload(string topic, string state)
+        {
+            await _mqttService.PublishPayload(topic, state);
+        }
+
         public IActionResult GetPayload()
         {
             return Content(_mqttService.GetPayload());
@@ -44,6 +50,7 @@ namespace MQTT_Parcel_Website.Controllers
             _mqttService = mqttService;
         }
 
+        [Route("/Privacy")]
         public IActionResult Privacy()
         {
             return View();

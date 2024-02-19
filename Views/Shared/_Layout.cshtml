@@ -13,14 +13,15 @@
         <!-- Links -->
         <link rel="icon" href="./logo.png">
         <link rel="apple-touch-icon" href="./logo.png">
-        <link rel="stylesheet" href="./css/main.css">
-        <link rel="stylesheet" href="./css/animations.css">
-        <link rel="stylesheet" href="./css/cookie.css">
-        <link rel="stylesheet" href="./css/index.css">
+        <link rel="stylesheet" type="text/css" href="./css/main.css">
+        <link rel="stylesheet" type="text/css" href="./css/animations.css">
+        <link rel="stylesheet" type="text/css" href="./css/cookie.css">
+        <link rel="stylesheet" type="text/css" href="./css/index.css">
         <link rel="manifest" href="./manifest.json">
         <script type="text/javascript" src="./js/cookie.js" defer></script>
         <script type="text/javascript" src="./js/main.js" defer></script>
     @RenderSection("Scripts", required: false)
+    @RenderSection("Styles", false)
     </head>
     <body>
         <header>
@@ -28,11 +29,11 @@
 
             <ol class="flex-row">
                 <li>Tracks: </li>
-                <li class="underline"><a href="/" target="_self">Arduino Packages</a></li>
+                <li class="underline"><a href="/Postman" target="_self">Arduino Packages</a></li>
             </ol>
 
             <article id="search-bar" class="flex-row">
-                <input id="parcel-search-bar" class="underline gradient hover" type="search">
+                <input id="parcel-search-bar" class="underline gradient hover" type="search" placeholder="Enter tracking number">
                 <input type="button" value="&#x1F50D;" onclick="searchIconPressed()">
             </article>
         </header>
@@ -72,7 +73,7 @@
         </main>
 
         <footer>
-            <h2>&copy; 2024 - 2024 <a href="/Postman" target="_self">Marcus, Casper & Jesper Co.</a>, All Rights Reserved.</h2>
+            <h2>&copy; 2024 - 2024 <a href="/" target="_self">Marcus, Casper & Jesper Co.</a>, All Rights Reserved.</h2>
         </footer>
 
         <script>

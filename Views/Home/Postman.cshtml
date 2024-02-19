@@ -2,37 +2,38 @@
     ViewData["Title"] = "Postman Page";
 }
 
-@* <p>Upload an image: <input type="file" id="file" accept="image/*"/></p>
-<div>
-<button type="button" onclick="detectBarcode()">Detect Barcode</button>
-</div>
-<div id="target"></div> *@
-
-@* <h1>Parcel Tracking</h1>
-<div id="barcodeScanner"></div>
-<div id="parcelStatus">
-<label for="status">Set Parcel Status:</label>
-<select id="status">
-<option value="received">Received</option>
-<option value="out_for_delivery">Out for Delivery</option>
-<option value="delivered">Delivered</option>
-</select>
-<button id="updateStatusBtn">Update Status</button>
-</div> *@
-
-@* <h1>Barcode Detection</h1>
-<video id="barcodeScanner"></video>
-<p id="barcodeData">Detected Barcode: </p>
-<button id="stopScannerBtn">Stop scanner</button> *@
-
-<div id="scannerContainer">
-    <video id="barcodeScanner" playsinline style="width: 100%; max-width: 100%; height: auto;"></video>
-    <div id="scannerButtons">
+<article id="scannerContainer" class="flex-col">
+    <section id="scannerButtons">
         <button id="openScannerButton">Open Scanner</button>
         <button id="closeScannerButton">Close Scanner</button>
-    </div>
-    <div id="barcodeResult"></div>
-</div>
+    </section>
+
+    <video id="barcodeScanner" playsinline style="width: 100%; max-width: 100%; height: auto;"></video>
+
+    <section id="parcelStatus" class="flex-col">
+        <label for="status">Set Parcel Status:</label>
+        <select id="status">
+            <option value="" disabled selected>Where is the package now?</option>
+            <hr />
+            <optgroup label="Before delivery">
+                <option value="0">Received</option>
+            </optgroup>
+            <hr />
+            <optgroup label="Under delivery">
+                <option value="1">Out for Delivery</option>
+            </optgroup>
+            <hr />
+            <optgroup label="After delivery">
+                <option value="2">Delivered</option>
+            </optgroup>
+        </select>
+        <button id="updateStatusBtn">Update Status</button>
+    </section>
+</article>
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="./css/postman.css">
+}
 
 @section Scripts {
     <script>
@@ -40,11 +41,16 @@
         let barcodeResultElement;
 
         document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector("#search-bar>input[type=button]").remove();
+            document.querySelector("header>ol").remove();
+            document.querySelector("header>h1").textContent = "Postman Panel | MQTT Parcel Tracker";
+
             videoElement = document.getElementById('barcodeScanner');
-            barcodeResultElement = document.getElementById('barcodeResult');
+            barcodeResultElement = document.getElementById('parcel-search-bar');
 
             document.getElementById('openScannerButton').addEventListener('click', openScanner);
             document.getElementById('closeScannerButton').addEventListener('click', closeScanner);
+            document.getElementById('updateStatusBtn').addEventListener('click', updateState);
         });
 
         function openScanner() {
@@ -52,6 +58,9 @@
                 alert('BarcodeDetector is not available');
                 return;
             }
+
+            // Clear the saved barcode result, when opening the scanner
+            barcodeResultElement.value = '';
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                 .then(stream => {
@@ -65,11 +74,15 @@
         }
 
         function closeScanner() {
-            const stream = videoElement.srcObject;
-            const tracks = stream.getTracks();
+            try {
+                const stream = videoElement.srcObject;
+                const tracks = stream.getTracks();
 
-            tracks.forEach(track => track.stop());
-            videoElement.srcObject = null;
+                tracks.forEach(track => track.stop());
+                videoElement.srcObject = null;
+            } catch (err) {
+                console.log(err);
+            }
         }
 
         function scanForBarcode() {
@@ -78,7 +91,7 @@
             barcodeDetector.detect(videoElement)
                 .then(barcodes => {
                     if (barcodes.length > 0) {
-                        barcodeResultElement.textContent = `Detected Barcode: ${barcodes[0].rawValue}`;
+                        barcodeResultElement.value = barcodes[0].rawValue ?? '';
                         closeScanner();
                     } else {
                         requestAnimationFrame(scanForBarcode);
@@ -86,101 +99,14 @@
                 })
                 .catch(err => console.error('Barcode detection error: ', err));
         }
+
+        async function updateState() {
+            const state = document.getElementById('status').value;
+            const parcelUri = document.getElementById('parcel-search-bar').value;
+
+            if (parcelUri && state) {
+                await fetch(`/Home/PublishPayload?topic=${parcelUri}&state=${state}`);
+            }
+        }
     </script>
 }
-@* <script>
-function writeLog(message) {
-const newState = document.createElement('p');
-newState.innerHTML = message;
-document.getElementById('target').appendChild(newState);
-}
-
-function detectBarcode() {
-if (!('BarcodeDetector' in window)) {
-alert('BarcodeDetector is not available');
-return;
-}
-
-const file = document.getElementById('file').files[0];
-
-if (!file) {
-alert('No image - Upload an image first.');
-return;
-}
-
-document.getElementById('target').innerHTML = '';
-const detector = new BarcodeDetector();
-
-createImageBitmap(file)
-.then((image) => detector.detect(image))
-.then((results) => {
-if (results.length) {
-results.forEach((result) => {
-writeLog(`Detected text: "${result.rawValue}" at (${Math.round(result.boundingBox.x)}, ${Math.round(result.boundingBox.y)})`);
-})
-} else {
-writeLog('No barcodes detected.');
-}
-})
-.catch((err) => {
-writeLog(`Barcode detection error: ${err}`);
-})
-}
-</script> *@
-
-@* <script>
-// Define variables
-let scannerIsRunning = false;
-
-// Initialize barcode scanner
-async function initBarcodeScanner() {
-try {
-const video = document.getElementById('barcodeScanner');
-const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-video.srcObject = stream;
-
-const barcodeDetector = new BarcodeDetector();
-
-video.onloadedmetadata = () => {
-video.play();
-scannerIsRunning = true;
-scanBarcode(barcodeDetector, video);
-};
-
-document.getElementById('stopScannerBtn').addEventListener('click', () => {
-if (scannerIsRunning) {
-scannerIsRunning = false;
-stream.getTracks().forEach(track => track.stop());
-video.srcObject = null;
-}
-});
-} catch (error) {
-alert('Barcode detection failed: ', error);
-}
-}
-
-// Scan barcode function
-async function scanBarcode(barcodeDetector, video) {
-while (scannerIsRunning) {
-try {
-const barcodes = await barcodeDetector.detect(video);
-
-if (barcodes.length > 0) {
-const barcodeValue = barcodes[0].rawValue;
-
-const barcodeDataElement = document.getElementById('barcodeData');
-barcodeDataElement.textContent = `Detected Barcode: ${barcodeValue}`;
-
-console.log("Barcode Value:", barcodeValue);
-}
-} catch (error) {
-alert('Barcode scan failed: ', error);
-}
-
-await new Promise(resolve => setTimeout(resolve, 1000));
-}
-}
-
-// Initialize barcode scanner
-initBarcodeScanner();
-</script> *@
