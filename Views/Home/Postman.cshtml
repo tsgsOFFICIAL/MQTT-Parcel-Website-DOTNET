@@ -20,13 +20,75 @@
 <button id="updateStatusBtn">Update Status</button>
 </div> *@
 
-<h1>Barcode Detection</h1>
+@* <h1>Barcode Detection</h1>
 <video id="barcodeScanner"></video>
 <p id="barcodeData">Detected Barcode: </p>
-<button id="stopScannerBtn">Stop scanner</button>
+<button id="stopScannerBtn">Stop scanner</button> *@
+
+<div id="scannerContainer">
+    <video id="barcodeScanner" playsinline style="width: 100%; max-width: 100%; height: auto;"></video>
+    <div id="scannerButtons">
+        <button id="openScannerButton">Open Scanner</button>
+        <button id="closeScannerButton">Close Scanner</button>
+    </div>
+    <div id="barcodeResult"></div>
+</div>
 
 @section Scripts {
-    @* <script>
+    <script>
+        let videoElement;
+        let barcodeResultElement;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            videoElement = document.getElementById('barcodeScanner');
+            barcodeResultElement = document.getElementById('barcodeResult');
+
+            document.getElementById('openScannerButton').addEventListener('click', openScanner);
+            document.getElementById('closeScannerButton').addEventListener('click', closeScanner);
+        });
+
+        function openScanner() {
+            if (!('BarcodeDetector' in window)) {
+                alert('BarcodeDetector is not available');
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    videoElement.srcObject = stream;
+                    videoElement.onloadedmetadata = () => {
+                        videoElement.play();
+                        scanForBarcode();
+                    };
+                })
+                .catch(err => console.error('getUserMedia error: ', err));
+        }
+
+        function closeScanner() {
+            const stream = videoElement.srcObject;
+            const tracks = stream.getTracks();
+
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+        }
+
+        function scanForBarcode() {
+            const barcodeDetector = new BarcodeDetector();
+
+            barcodeDetector.detect(videoElement)
+                .then(barcodes => {
+                    if (barcodes.length > 0) {
+                        barcodeResultElement.textContent = `Detected Barcode: ${barcodes[0].rawValue}`;
+                        closeScanner();
+                    } else {
+                        requestAnimationFrame(scanForBarcode);
+                    }
+                })
+                .catch(err => console.error('Barcode detection error: ', err));
+        }
+    </script>
+}
+@* <script>
 function writeLog(message) {
 const newState = document.createElement('p');
 newState.innerHTML = message;
@@ -66,60 +128,59 @@ writeLog(`Barcode detection error: ${err}`);
 }
 </script> *@
 
-    <script>
-        // Define variables
-        let scannerIsRunning = false;
+@* <script>
+// Define variables
+let scannerIsRunning = false;
 
-        // Initialize barcode scanner
-        async function initBarcodeScanner() {
-            try {
-                const video = document.getElementById('barcodeScanner');
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = stream;
+// Initialize barcode scanner
+async function initBarcodeScanner() {
+try {
+const video = document.getElementById('barcodeScanner');
+const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+video.srcObject = stream;
 
-                const barcodeDetector = new BarcodeDetector();
+const barcodeDetector = new BarcodeDetector();
 
-                video.onloadedmetadata = () => {
-                    video.play();
-                    scannerIsRunning = true;
-                    scanBarcode(barcodeDetector, video);
-                };
+video.onloadedmetadata = () => {
+video.play();
+scannerIsRunning = true;
+scanBarcode(barcodeDetector, video);
+};
 
-                document.getElementById('stopScannerBtn').addEventListener('click', () => {
-                    if (scannerIsRunning) {
-                        scannerIsRunning = false;
-                        stream.getTracks().forEach(track => track.stop());
-                        video.srcObject = null;
-                    }
-                });
-            } catch (error) {
-                alert('Barcode detection failed: ', error);
-            }
-        }
-
-        // Scan barcode function
-        async function scanBarcode(barcodeDetector, video) {
-            while (scannerIsRunning) {
-                try {
-                    const barcodes = await barcodeDetector.detect(video);
-
-                    if (barcodes.length > 0) {
-                        const barcodeValue = barcodes[0].rawValue;
-
-                        const barcodeDataElement = document.getElementById('barcodeData');
-                        barcodeDataElement.textContent = `Detected Barcode: ${barcodeValue}`;
-
-                        console.log("Barcode Value:", barcodeValue);
-                    }
-                } catch (error) {
-                    alert('Barcode scan failed: ', error);
-                }
-
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-        }
-
-        // Initialize barcode scanner
-        initBarcodeScanner();
-    </script>
+document.getElementById('stopScannerBtn').addEventListener('click', () => {
+if (scannerIsRunning) {
+scannerIsRunning = false;
+stream.getTracks().forEach(track => track.stop());
+video.srcObject = null;
 }
+});
+} catch (error) {
+alert('Barcode detection failed: ', error);
+}
+}
+
+// Scan barcode function
+async function scanBarcode(barcodeDetector, video) {
+while (scannerIsRunning) {
+try {
+const barcodes = await barcodeDetector.detect(video);
+
+if (barcodes.length > 0) {
+const barcodeValue = barcodes[0].rawValue;
+
+const barcodeDataElement = document.getElementById('barcodeData');
+barcodeDataElement.textContent = `Detected Barcode: ${barcodeValue}`;
+
+console.log("Barcode Value:", barcodeValue);
+}
+} catch (error) {
+alert('Barcode scan failed: ', error);
+}
+
+await new Promise(resolve => setTimeout(resolve, 1000));
+}
+}
+
+// Initialize barcode scanner
+initBarcodeScanner();
+</script> *@
