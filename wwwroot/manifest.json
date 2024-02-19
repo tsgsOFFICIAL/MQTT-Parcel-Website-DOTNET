@@ -24,6 +24,12 @@
       "sizes": "1440x3085",
       "type": "image/png",
       "label": "Parcel tracking with ease"
+    },
+    {
+      "src": "assets/screenshots/postman.png",
+      "sizes": "1440x3085",
+      "type": "image/png",
+      "label": "Parcel state with ease"
     }
   ],
   "icons": [
